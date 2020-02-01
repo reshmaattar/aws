@@ -1,10 +1,12 @@
 import configparser
 
+""" This parser reads config ini for respective environment"""
+
 
 class MyParser(configparser.ConfigParser):
 
     def readconfig(self, filename, section):
-        # create a parser
+        # create template parser
         # read config file
         self.read(filename)
 

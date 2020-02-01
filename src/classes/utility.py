@@ -2,6 +2,9 @@ import json
 
 from deepdiff import DeepDiff
 
+"""" This class basically compares json file. 
+If files are equal ,it prints {} else, it prints differences"""
+
 
 class CompareFile:
 

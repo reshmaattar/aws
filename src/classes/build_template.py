@@ -7,6 +7,7 @@ from troposphere.ec2 import PortRange
 
 from src.classes.Parser import MyParser
 
+"""" The purpose of this class to create vpc,network and gateway for respective environment """
 GATEWAY = "InternetGateway"
 VPC_NAME = "VPC"
 VPC_GATEWAYATTACHMENT = "VpcGatewayAttachment"
@@ -21,7 +22,6 @@ class EnvironmentTemplate:
 
     def __init__(self, Env=os.environ.get('ENV', 'Development')):
         self.env = Env
-        # url_config = os.path.join(os.getcwd(), '../config/config.ini')
         url_config = os.getcwd() + '/config/config.ini'
         p = MyParser()
         self.config = p.readconfig(url_config, self.env)
@@ -34,9 +34,13 @@ class EnvironmentTemplate:
         self.gateway = None
         self.gateway_attachment = None
 
+    """ private method to set tags for the resources"""
+
     def __set_tags(self, name):
         tags = [{"Key": "Environment", "Value": self.env}, {"Key": "Name", "Value": "%s-%s" % (self.env, name)}]
         return tags
+
+    """ create gateway within the vpc"""
 
     def create_gateway(self, name=GATEWAY):
         self.gateway = self.template.add_resource(ec2.InternetGateway(name, Tags=self.__set_tags("InternetGateway")))
@@ -52,6 +56,8 @@ class EnvironmentTemplate:
                                      InternetGatewayId=self.gateway.Ref(),
                                      )
         )
+
+    """ create vpc n/w access list,inboud and outbound rule"""
 
     def create_network(self):
         self.vpc_nw_acl = self.template.add_resource(
@@ -76,6 +82,8 @@ class EnvironmentTemplate:
                                 RuleAction="allow",
                                 CidrBlock="0.0.0.0/0"))
 
+    """ create vpc for given template"""
+
     def create_vpc(self, name=VPC_NAME):
         self.vpc = self.template.add_resource(ec2.VPC(
             name, CidrBlock=self.config['vpc_cidrblock'], EnableDnsSupport=True,
@@ -83,8 +91,7 @@ class EnvironmentTemplate:
         # Just about everything needs this, so storing it on the object
         self.template.add_output(Output(VPC_ID, Value=self.vpc.Ref()))
 
-    def printw(self):
-        print(self.template.to_json())
+    """ write template json to the file"""
 
     def write_to_file(self, filename):
         with open(filename, 'w') as f:
