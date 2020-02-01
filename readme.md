@@ -9,5 +9,5 @@
 1. python3 main.py 
 
 #Output:
- Running main.py will take Template for defined environment and create output json in output folder,which can be compared with template provided
+ Running main.py will take create cloudformation template for defined environment and create output json in output folder,which can be compared with template provided
  
